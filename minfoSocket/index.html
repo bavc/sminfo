@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+	<script src='//code.jquery.com/jquery-1.7.2.min.js'></script>
+	<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" rel="stylesheet" integrity="sha256-MfvZlkHCEqatNoGiOXveE8FIwMzZg4W85qfrfIFBfYc= sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+	    <script>
+    	var socket = io.connect('//localhost:3000');
+    	socket.on('data', function(data) {
+                console.log(data);
+                $('h3').hide();
+                $('#messages').append("<ul><h4>" + data.val + "</h4></ul>");
+                if(data.val == "SalesForce Updated Successfully"){
+                socket.emit('data',"close");
+                }
+
+            });
+    	socket.on('error', function() { console.error(arguments) });
+        socket.on('message', function() { console.log(arguments) });
+
+
+    </script>
+</head>
+<body>
+<h3>Please Wait Generating Metadata</h3>
+<ul id='messages'></ul>
+
+</body>
+</html>

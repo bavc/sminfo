@@ -1,0 +1,15 @@
+{
+  "node": true,
+
+  "boss": true, // Suppress warnings for `while (a = fn())` and similar.
+  "expr": true, // Suppress warnings for `a || (a = 1)` and similar.
+
+  "predef": [
+    "after",
+    "afterEach",
+    "before",
+    "beforeEach",
+    "describe",
+    "it"
+  ]
+}

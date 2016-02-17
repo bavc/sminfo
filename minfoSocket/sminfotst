@@ -1,0 +1,331 @@
+#!/usr/bin/env node
+var app = require('express')();
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+var XML = require('pixl-xml');
+var jsforce = require('jsforce');
+var conn = new jsforce.Connection();
+var exec = require('child_process').exec;
+var fs = require("fs");
+var minfo = 'mediainfo -f --Output=XML ';
+var O = 'open http://localhost:3000';
+var digest;
+var hashsum = require('hashsum');
+var elements = [];
+
+
+
+app.get('/', function(req, res) {
+    res.sendFile(__dirname + '/index.html');
+});
+
+http.listen(3000, function() {
+    console.log('listening on *:3000');
+    exec(O, function(error, stdout, stderr) {
+
+    });
+});
+
+hashsum.file(process.argv[2], function (err, hash) {
+  digest = hash;
+
+
+    exec(minfo + process.argv[2], function(error, stdout, stderr) {
+        var doc = XML.parse(stdout);
+        // console.log(JSON.stringify(doc));
+
+        try {
+            if (typeof doc.File.track[0].File_name === undefined) {
+                elements[1] = "Media report for : " + doc.File.track[0].File_name + "." + doc.File.track[0].File_extension + "  \n";
+                var FileName = doc.File.track[0].File_name + "." + doc.File.track[0].File_extension;
+            }
+        } catch (e) {
+            console.log(e);
+            var FileName = "No Data";
+        }
+
+        try {
+            if (typeof doc.File.track[0].File_last_modification_date) {
+                elements[2] = "Last Modification Date : " + doc.File.track[0].File_last_modification_date + "  \n";
+                var ModDate = doc.File.track[0].File_last_modification_date;
+            }
+        } catch (e) {
+            console.log(e);
+            var ModDate = "No Data";
+        }
+        elements[2] = "Checksum Algorithm : SHA-1  \n";
+        try {
+            if (typeof digest !== undefined) {
+                elements[3] = "Checksum Digest : " + digest + "  \n";
+            }
+        } catch (e) {
+            console.log(e);
+            digest = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[0].Writing_application[1] !== undefined) {
+                elements[4] = "Writing Application : " + doc.File.track[0].Writing_application[1] + "  \n";
+                var WritingApp = doc.File.track[0].Writing_application[1];
+            }
+        } catch (e) {
+            console.log(e);
+            var WritingApp = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[0].File_extension !== undefined) {
+                elements[5] = "File Extension : " + doc.File.track[0].File_extension + "  \n";
+                var FileExt = doc.File.track[0].File_extension;
+            }
+        } catch (e) {
+            console.log(e);
+            var FileExt = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[0].Frame_count !== undefined) {
+                elements[6] = "Frame Count : " + doc.File.track[0].Frame_count + "  \n";
+                var FramCnt = doc.File.track[0].Frame_count;
+            }
+        } catch (e) {
+            console.log(e);
+            var FramCnt = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[0].Folder_name !== undefined) {
+                elements[7] = "Location : " + doc.File.track[0].Folder_name + "  \n";
+                var Loc = doc.File.track[0].Folder_name;
+            }
+        } catch (e) {
+            console.log(e);
+            var Loc = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[0].Duration[5] !== undefined) {
+                elements[8] = "Duration : " + doc.File.track[0].Duration[5] + "  \n";
+                var dur = doc.File.track[0].Duration[5];
+            }
+        } catch (e) {
+            console.log(e);
+            var dur = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[0].Overall_bit_rate[1] !== undefined) {
+                elements[9] = "Bit Rate : " + doc.File.track[0].Overall_bit_rate[1] + "  \n";
+                var bitRate = doc.File.track[0].Overall_bit_rate[1];
+            }
+        } catch (e) {
+            console.log(e);
+            var bitRate = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[1].Codec_ID !== undefined) {
+                elements[10] = "Codec ID : " + doc.File.track[1].Codec_ID + "  \n";
+                codec = doc.File.track[1].Codec_ID;
+            }
+        } catch (e) {
+            console.log(e);
+            var codec = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[1].Color_space !== undefined) {
+                elements[11] = "Color Space : " + doc.File.track[1].Color_space + "  \n";
+                var clrSpc = doc.File.track[1].Color_space
+            }
+        } catch (e) {
+            console.log(e);
+            var clrSpc = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[1].Chroma_subsampling !== undefined) {
+                elements[12] = "Chroma Subsampling : " + doc.File.track[1].Chroma_subsampling + "  \n";
+                var subSample = doc.File.track[1].Chroma_subsampling;
+            }
+        } catch (e) {
+            console.log(e);
+            var subSample = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[1].Width !== undefined) {
+                elements[13] = "Frame Size : " + doc.File.track[1].Width[0] + "x" + doc.File.track[1].Height[0] + "  \n";
+                var frmSize = doc.File.track[1].Width[0] + "x" + doc.File.track[1].Height[0];
+            }
+        } catch (e) {
+            console.log(e);
+            var frmSize = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[1].Display_aspect_ratio[1] !== undefined) {
+                elements[14] = "Aspect Ratio : " + doc.File.track[1].Display_aspect_ratio[1] + "  \n";
+                var asRtio = doc.File.track[1].Display_aspect_ratio[1];
+            }
+        } catch (e) {
+            console.log(e);
+            var asRtio = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[1].Frame_rate !== undefined) {
+                elements[15] = "Framerate : " + doc.File.track[1].Frame_rate[1] + "  \n";
+                var frmRate = doc.File.track[1].Frame_rate[1];
+            }
+        } catch (e) {
+            console.log(e);
+            var frmRate = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[1].Bit_depth !== undefined) {
+                elements[16] = "FBit Depth : " + doc.File.track[1].Bit_depth[1] + "  \n";
+                var bitDpth = doc.File.track[1].Bit_depth[1];
+            }
+        } catch (e) {
+            console.log(e);
+            var bitDpth = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[1].Compression_mode[0] !== undefined) {
+                elements[17] = "Compression Type : " + doc.File.track[1].Compression_mode[0] + "  \n";
+                var cmpMode = doc.File.track[1].Compression_mode[0];
+            }
+        } catch (e) {
+            console.log(e);
+            var cmpMode = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[1].Color_space !== undefined) {
+                elements[18] = "Color Space : " + doc.File.track[1].Color_space + "  \n";
+                var clrSpc = doc.File.track[1].Color_space;
+            }
+        } catch (e) {
+            console.log(e);
+            var clrSpc = "No Data";
+        }
+        
+		
+		try {
+            if (typeof doc.File.track[2].Channel_positions !== undefined) {
+                elements[19] = "Audio Channels Configuration: " + doc.File.track[2].Channel_positions[1] + "  \n";
+                var audLR = doc.File.track[2].Channel_positions[1];
+            }
+        } catch (e) {
+            console.log(e);
+            var audLR = "No Data";
+        }
+        
+		
+		
+		
+		
+		try {
+            if (typeof doc.File.track[2].Channel_s_ !== undefined) {
+                elements[23] = "Audio Channels : " + doc.File.track[2].Channel_s_[1] + "  \n";
+                var audChnl = doc.File.track[2].Channel_s_[1];
+            }
+        } catch (e) {
+            console.log(e);
+            var audChnl = "No Data";
+        }
+		
+		
+		
+		
+		
+		try {
+            if (typeof doc.File.track[2].Codec !== undefined) {
+                elements[20] = "Audio Codec : " + doc.File.track[2].Codec[1] + "  \n";
+                var audCodec = doc.File.track[2].Codec[1];
+            }
+        } catch (e) {
+            console.log(e);
+            var audCodec = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[2].Sampling_rate[1] !== undefined) {
+                elements[21] = "Audio Sample Rate : " + doc.File.track[2].Sampling_rate[1] + "  \n";
+                var smplRate = doc.File.track[2].Sampling_rate[1];
+            }
+        } catch (e) {
+            console.log(e);
+            var smplRate = "No Data";
+        }
+        try {
+            if (typeof doc.File.track[2].Bit_rate !== undefined) {
+                elements[22] = "Audio Bit Rate : " + doc.File.track[2].Bit_rate[1] + "  \n";
+                var audBitRate = doc.File.track[2].Bit_rate[1];
+            }
+        } catch (e) {
+            console.log(e);
+            var audBitRate = "No Data";
+        }
+
+
+
+        conn.login('preservation@bavc.org', 'pr3s3rvationfnJ7Mjp9eAuqwVBIgWc5XLHz', function(err, res) {
+            if (err) {
+                return console.error(err);
+            }
+            var barcode = process.argv[3];
+            conn.sobject("Preservation_Object__c").upsert({
+                ExternalID__c: barcode,
+                Name: barcode,
+                messageDigestAlgorithm__c: 'SHA-1',
+                messageDigest__c: digest,
+                instantiationIdentifierDigital__c: doc.File.track[0].File_name + "." + doc.File.track[0].File_extension,
+                instantiationDigital__c: FileExt,
+                essenceTrackDuration__c: dur,
+                essenceTrackEncodingVideo__c: codec,
+                instantiationDigitalColorSpace__c: clrSpc,
+                essenceTrackAspectRatio__c: asRtio,
+                essenceTrackFrameSize__c: frmSize,
+                essenceTrackFrameRate__c: frmRate,
+                essenceTrackCompressionMode__c: cmpMode,
+                instantiationChannelConfigDigitalLayout__c: audChnl,
+                instantiationChannelConfigurationDigital__c: audLR,
+                essenceTrackSamplingRate__c: smplRate,
+                essenceTrackEncodingAudio__c: audCodec,
+                instantiationFileSize__c: getFilesizeInBytes(process.argv[2]),
+                instantiationDataRateVideo__c: audBitRate,
+                essenceTrackBitDepthVideo__c: bitDpth,
+                instantiationDigitalChromaSubsampling__c: subSample,
+                instantiationDataRateAudio__c: audBitRate
+            }, 'ExternalID__c', function(err, ret) {
+                if (err || !ret.success) {
+                    return console.error(err, ret);
+                }
+                io.sockets.emit('data', {
+                    val: "Media report for : " + doc.File.track[0].File_name + "." + doc.File.track[0].File_extension
+                });
+                for (item in elements) {
+                    io.sockets.emit('data', {
+                        val: elements[item]
+                    });
+                    console.log(elements[item]);
+                }
+                io.sockets.emit('data', {
+                    val: 'SalesForce Updated Successfully'
+                });
+
+
+
+            });
+        });
+    });
+});
+
+    io.on('connection', function(socket) {
+        socket.on('data', function(msg) {
+            if(msg == "close"){
+                process.exit(0);
+            }
+        });
+
+    });
+
+function frameRateCalc(val) {
+    var rate = math.eval(val);
+    return rate;
+}
+
+function getFilesizeInBytes(filename) {
+    var stats = fs.statSync(filename)
+    var fileSizeInBytes = stats["size"]
+    var fileSizeInMegabytes = fileSizeInBytes / 1000000.0
+    return fileSizeInMegabytes + " MB"
+}
